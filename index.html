@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fill-in-the-Blanks Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* General Styles */
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f0f2f5;
+        color: #333;
+        margin: 0;
+        padding: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 800px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        box-sizing: border-box;
+      }
+
+      h1,
+      h2 {
+        color: #1a202c;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+        margin-top: 0;
+      }
+
+      button {
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        font-size: 0.9rem;
+      }
+
+      .btn-primary {
+        background-color: #4a5568;
+        color: white;
+      }
+      .btn-primary:hover {
+        background-color: #2d3748;
+      }
+
+      .btn-secondary {
+        background-color: #718096;
+        color: white;
+      }
+      .btn-secondary:hover {
+        background-color: #4a5568;
+      }
+
+      .btn-danger {
+        background-color: #e53e3e;
+        color: white;
+      }
+      .btn-danger:hover {
+        background-color: #c53030;
+      }
+
+      /* Table View */
+      #tableView {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      .test-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+      }
+
+      .test-table th,
+      .test-table td {
+        padding: 0.8rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .test-table th {
+        background-color: #f7fafc;
+        font-weight: 600;
+        color: #4a5568;
+      }
+
+      .test-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Test View */
+      #testView {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      .test-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+      }
+
+      .back-arrow {
+        font-size: 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+        color: #4a5568;
+        transition: color 0.2s;
+      }
+      .back-arrow:hover {
+        color: #2d3748;
+      }
+
+      .test-content {
+        line-height: 2.5;
+        font-size: 1.1rem;
+        background-color: #f7fafc;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .test-content input {
+        width: 60px;
+        border: 2px solid #cbd5e0;
+        border-radius: 6px;
+        padding: 4px 6px;
+        font-size: 1rem;
+        text-align: center;
+        transition: border-color 0.2s;
+        margin: 0 4px;
+      }
+      .test-content input:focus {
+        outline: none;
+        border-color: #4a5568;
+      }
+
+      /* Input validation styles */
+      .test-content .correct {
+        border-color: #48bb78;
+        background-color: #f0fff4;
+      }
+      .test-content .partial {
+        border-color: #ecc94b;
+        background-color: #fffff0;
+      }
+      .test-content .incorrect {
+        border-color: #f56565;
+        background-color: #fff5f5;
+      }
+
+      .action-buttons {
+        margin-top: 1.5rem;
+        text-align: right;
+      }
+
+      /* Results View */
+      #resultsArea {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background-color: #f7fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      #resultsArea h3 {
+        margin-top: 0;
+        color: #2d3748;
+      }
+
+      #scoreDisplay {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+
+      #fullTextContainer {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #ffffff;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        line-height: 1.6;
+      }
+
+      .incorrect-answer-text {
+        text-decoration: underline;
+        color: #c53030;
+      }
+
+      .official-answer-text {
+        color: #2f855a;
+        font-weight: bold;
+      }
+
+      .additional-answers-text {
+        color: #718096;
+        font-style: italic;
+      }
+
+      /* Utility classes */
+      .hidden {
+        display: none;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- View for the list of tests -->
+      <div id="tableView">
+        <h1>Available Tests</h1>
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Score</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="testsList"></tbody>
+        </table>
+      </div>
+
+      <!-- View for taking or reviewing a test -->
+      <div id="testView" class="hidden">
+        <div class="test-header">
+          <span class="back-arrow" onclick="app.showTableView()">&larr;</span>
+          <h2 id="testName"></h2>
+        </div>
+        <div id="testContent" class="test-content"></div>
+        <div class="action-buttons">
+          <button id="submitBtn" class="btn-primary">Submit</button>
+          <button id="resetBtn" class="btn-danger hidden">Reset Test</button>
+        </div>
+        <div id="resultsArea" class="hidden">
+          <h3>Results</h3>
+          <div id="scoreDisplay"></div>
+          <div id="fullTextContainer">
+            <h4>Full Correct Text:</h4>
+            <p id="fullText"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="./tests.js"></script>
+    <script src="./index.js"></script>
+  </body>
+</html>
