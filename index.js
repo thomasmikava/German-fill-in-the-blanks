@@ -23,7 +23,7 @@ const app = {
     document.getElementById("tableView").classList.add("hidden");
     document.getElementById("testView").classList.remove("hidden");
 
-    document.getElementById("testName").innerText = test.name;
+    document.getElementById("testName").innerText = `(${test.id}) ${test.name}`;
     document.getElementById("resultsArea").classList.add("hidden");
     document.getElementById("submitBtn").classList.remove("hidden");
     document.getElementById("resetBtn").classList.add("hidden");
@@ -42,7 +42,7 @@ const app = {
     this.tests.forEach((test) => {
       const result = this.getStoredResult(test.id);
       const score = result
-        ? `${((result.score / result.totalBlanks) * 100).toFixed(0)}%`
+        ? `${result.score}/${result.totalBlanks}`
         : "Not taken";
 
       const row = document.createElement("tr");
