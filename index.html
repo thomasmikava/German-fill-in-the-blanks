@@ -162,7 +162,9 @@
       }
       .test-content .partial {
         border-color: #ecc94b;
-        background-color: #fffff0;
+        /* background-color: #fffff0; */
+        background-color: #d4fffd;
+        color: #000;
       }
       .test-content .incorrect {
         border-color: #f56565;
@@ -172,6 +174,15 @@
       .action-buttons {
         margin-top: 1.5rem;
         text-align: right;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+      }
+
+      /* Red styling for incorrect inputs that can still be edited */
+      .test-content .incorrect-editable {
+        border-color: #f56565;
+        background-color: #fff5f5;
       }
 
       /* Results View */
@@ -260,6 +271,9 @@
         </div>
         <div id="testContent" class="test-content"></div>
         <div class="action-buttons">
+          <button id="submitPartialBtn" class="btn-secondary hidden">
+            Submit Non-Empty
+          </button>
           <button id="submitBtn" class="btn-primary">Submit</button>
           <button id="resetBtn" class="btn-danger hidden">Reset Test</button>
         </div>
