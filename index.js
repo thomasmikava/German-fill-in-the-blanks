@@ -92,6 +92,20 @@ const app = {
           span.style.margin = "0 4px";
           span.style.borderRadius = "6px";
           span.textContent = attemptData.userInput;
+
+          // Add info icon if explanation exists
+          if (item.explanation) {
+            const infoIcon = document.createElement("span");
+            infoIcon.classList.add("info-icon");
+
+            const tooltip = document.createElement("span");
+            tooltip.classList.add("tooltip");
+            tooltip.textContent = item.explanation;
+            infoIcon.appendChild(tooltip);
+
+            span.appendChild(infoIcon);
+          }
+
           contentDiv.appendChild(span);
         } else {
           // Show as input (either new or incorrect from previous attempt)
@@ -385,6 +399,19 @@ const app = {
           span.innerHTML = `<span class="incorrect-answer-text">${
             savedAnswer.userInput || "___"
           }</span> <span class="official-answer-text">${officialAnswer}</span><span class="additional-answers-text">${additionalText}</span>`;
+        }
+
+        // Add info icon if explanation exists
+        if (item.explanation) {
+          const infoIcon = document.createElement("span");
+          infoIcon.classList.add("info-icon");
+
+          const tooltip = document.createElement("span");
+          tooltip.classList.add("tooltip");
+          tooltip.textContent = item.explanation;
+          infoIcon.appendChild(tooltip);
+
+          span.appendChild(infoIcon);
         }
 
         contentDiv.appendChild(span);

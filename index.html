@@ -230,6 +230,63 @@
         font-style: italic;
       }
 
+      /* Info icon and tooltip styles */
+      .info-icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background-color: #3182ce;
+        border-radius: 50%;
+        color: white;
+        text-align: center;
+        line-height: 16px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-left: 4px;
+        cursor: help;
+        position: relative;
+        vertical-align: middle;
+      }
+
+      .info-icon::before {
+        content: "i";
+      }
+
+      .tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #2d3748;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: normal;
+        white-space: nowrap;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+        pointer-events: none;
+        margin-bottom: 5px;
+      }
+
+      .tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #2d3748;
+      }
+
+      .info-icon:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+      }
+
       /* Utility classes */
       .hidden {
         display: none;
