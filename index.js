@@ -73,25 +73,39 @@ const app = {
     const contentDiv = document.getElementById("testContent");
     contentDiv.innerHTML = "";
     const attempts = this.getStoredAttempts(test.id);
-    let inputIndex = 0;
+    let inputIndex = 0; // Index for actual DOM input elements
+    let missingItemIndex = 0; // Index for missing items in the test data
 
     test.content.items.forEach((item) => {
       if (item.type === "text") {
         contentDiv.appendChild(document.createTextNode(item.value));
       } else if (item.type === "missing") {
-        const attemptData = attempts && attempts.answers[inputIndex];
+        const attemptData = attempts && attempts.answers[missingItemIndex];
 
         if (
           attemptData &&
-          (attemptData.status === "correct" || attemptData.status === "partial")
+          (attemptData.status === "correct" ||
+            attemptData.status === "partial" ||
+            attemptData.status === "revealed")
         ) {
-          // Show as unchangeable text for correct/partial answers
+          // Show as unchangeable text for correct/partial/revealed answers
           const span = document.createElement("span");
-          span.classList.add(attemptData.status);
+          span.classList.add(
+            attemptData.status === "revealed" ? "incorrect" : attemptData.status
+          );
           span.style.padding = "4px 6px";
           span.style.margin = "0 4px";
           span.style.borderRadius = "6px";
-          span.textContent = attemptData.userInput;
+
+          if (attemptData.status === "revealed") {
+            // Display as crossed out user input + correct answer
+            const officialAnswer = item.officialAnswers[0];
+            span.innerHTML = `<span class="incorrect-answer-text">${
+              attemptData.userInput || "___"
+            }</span> <span class="official-answer-text">${officialAnswer}</span>`;
+          } else {
+            span.textContent = attemptData.userInput;
+          }
 
           // Add info icon if explanation exists
           if (item.explanation) {
@@ -112,6 +126,7 @@ const app = {
           const input = document.createElement("input");
           input.type = "text";
           input.dataset.index = inputIndex;
+          input.dataset.missingItemIndex = missingItemIndex; // Store the missing item index
 
           if (attemptData) {
             if (attemptData.status === "incorrect") {
@@ -121,8 +136,46 @@ const app = {
           }
 
           contentDiv.appendChild(input);
+
+          // Add reveal answer icon for incorrect inputs
+          if (attemptData && attemptData.status === "incorrect") {
+            const revealIcon = document.createElement("span");
+            revealIcon.classList.add("reveal-icon");
+            revealIcon.dataset.itemIndex = missingItemIndex; // Use missing item index
+
+            const tooltip = document.createElement("span");
+            tooltip.classList.add("tooltip");
+            tooltip.textContent = "Reveal answer";
+            revealIcon.appendChild(tooltip);
+
+            // Add click handler for reveal functionality
+            const capturedMissingItemIndex = missingItemIndex; // Capture missing item index for closure
+            revealIcon.addEventListener("click", (e) => {
+              console.log(
+                "Reveal clicked for missing item index:",
+                capturedMissingItemIndex
+              );
+              this.revealAnswer(capturedMissingItemIndex);
+            });
+
+            contentDiv.appendChild(revealIcon);
+          }
         }
-        inputIndex++;
+
+        // Only increment inputIndex when we actually create an input element
+        if (
+          !(
+            attemptData &&
+            (attemptData.status === "correct" ||
+              attemptData.status === "partial" ||
+              attemptData.status === "revealed")
+          )
+        ) {
+          inputIndex++;
+        }
+
+        // Always increment missingItemIndex for each missing item
+        missingItemIndex++;
       }
     });
 
@@ -184,11 +237,12 @@ const app = {
     missingItems.forEach((item, index) => {
       const existingAttempt = attempts.answers[index];
 
-      // If already correct/partial, count toward score but don't process input
+      // If already correct/partial/revealed, count toward score but don't process input
       if (
         existingAttempt &&
         (existingAttempt.status === "correct" ||
-          existingAttempt.status === "partial")
+          existingAttempt.status === "partial" ||
+          existingAttempt.status === "revealed")
       ) {
         if (existingAttempt.status === "correct") {
           currentScore++;
@@ -295,18 +349,20 @@ const app = {
       let userAnswer = "";
       let status = "incorrect";
 
-      // Check if this was already completed in partial submission
+      // Check if this was already completed in partial submission or revealed
       if (
         attempts &&
         attempts.answers[index] &&
         (attempts.answers[index].status === "correct" ||
-          attempts.answers[index].status === "partial")
+          attempts.answers[index].status === "partial" ||
+          attempts.answers[index].status === "revealed")
       ) {
         userAnswer = attempts.answers[index].userInput;
         status = attempts.answers[index].status;
         if (status === "correct") {
           score++;
         }
+        // Revealed answers should not contribute to score
       } else {
         // Get from input
         const input = inputs[inputIndex];
@@ -374,6 +430,14 @@ const app = {
 
         if (savedAnswer.status === "correct") {
           span.textContent = savedAnswer.userInput;
+        } else if (savedAnswer.status === "revealed") {
+          // Display as crossed out user input + correct answer (like incorrect)
+          const additionalText = item.additionalAnswers
+            ? ` [${item.additionalAnswers.join(", ")}]`
+            : "";
+          span.innerHTML = `<span class="incorrect-answer-text">${
+            savedAnswer.userInput || "___"
+          }</span> <span class="official-answer-text">${officialAnswer}</span><span class="additional-answers-text">${additionalText}</span>`;
         } else if (savedAnswer.status === "partial") {
           // Check if this was a previously incorrect answer that became correct
           const attempts = this.getStoredAttempts(test.id);
@@ -509,6 +573,39 @@ const app = {
 
     // Show partial submit button if test is already partial or if there are non-empty inputs
     submitPartialBtn.classList.toggle("hidden", !isPartial && !hasNonEmpty);
+  },
+
+  revealAnswer(inputIndex) {
+    const test = this.tests.find((t) => t.id === this.currentTestId);
+    if (!test) return;
+
+    const missingItems = test.content.items.filter(
+      (item) => item.type === "missing"
+    );
+    const item = missingItems[inputIndex];
+    if (!item) return;
+
+    // Get current attempts
+    const attempts = this.getStoredAttempts(test.id) || {
+      answers: new Array(missingItems.length).fill(null),
+      scoringEligible: new Array(missingItems.length).fill(true),
+    };
+
+    // Get the user's original input
+    const originalUserInput = attempts.answers[inputIndex]?.userInput || "";
+
+    // Mark this answer as revealed - store original input but mark as "revealed"
+    attempts.answers[inputIndex] = {
+      userInput: originalUserInput,
+      status: "revealed",
+    };
+    attempts.scoringEligible[inputIndex] = false;
+
+    // Store the updated attempts
+    this.storeAttempts(test.id, attempts);
+
+    // Re-render the test to show the revealed answer
+    this.renderTest(test);
   },
 };
 

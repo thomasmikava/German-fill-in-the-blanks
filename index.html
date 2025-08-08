@@ -287,6 +287,42 @@
         visibility: visible;
       }
 
+      /* Reveal answer icon styles */
+      .reveal-icon {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        background-color: #e53e3e;
+        border-radius: 50%;
+        color: white;
+        text-align: center;
+        line-height: 18px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-left: 6px;
+        cursor: pointer;
+        position: relative;
+        vertical-align: middle;
+        transition: background-color 0.2s;
+      }
+
+      .reveal-icon:hover {
+        background-color: #c53030;
+      }
+
+      .reveal-icon::before {
+        content: "?";
+      }
+
+      .reveal-icon .tooltip {
+        white-space: nowrap;
+      }
+
+      .reveal-icon:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+      }
+
       /* Utility classes */
       .hidden {
         display: none;
